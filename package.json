@@ -10,7 +10,7 @@
     "build:prod": "webpack --config webpack.prod.js"
   },
   "author": "Paul Rodriguez",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
