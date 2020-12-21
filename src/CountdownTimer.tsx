@@ -1,44 +1,74 @@
-const { Component } = React;
+import * as React from 'react';
 
 const RADIUS = 35;
 const TIMER_REMAINING_ID='base-timer-path-remaining';
 const WARNING_THRESHOLD = 0.5;
 
-class CountdownTimer extends Component {
-  constructor(props) {
+class CountdownTimer extends React.Component<any, any> {
+  // // @ts-ignore
+  // static propTypes: {
+  //   // @ts-ignore
+  //   radius: PropTypes.number,
+  //   autoplay: PropTypes.bool,
+  //   timer_remaining_id: PropTypes.string,
+  //   onTogglePlay: PropTypes.func,
+  //   onComplete: PropTypes.func,
+  //   minutes: PropTypes.number,
+  //   seconds: PropTypes.number,
+  //   warning_threshold: PropTypes.number
+
+    // }
+
+    static defaultProps = {
+      radius: RADIUS,
+      timer_remaining_id: TIMER_REMAINING_ID,
+      warning_threshold: WARNING_THRESHOLD
+    }
+  constructor(props: any) {
     super(props);
     this.state = {
-      radius:RADIUS,
-      id: TIMER_REMAINING_ID,
+      radius:props.radius,
+      id: props.timer_remaining_id,
       active: false,
       paused: false,
-      interval: null
+      finished: false,
+      interval: null,
+      animateTimer: false
     }
 
     this.togglePlay = this.togglePlay.bind(this);
+    this.toggleAnimate = this.toggleAnimate.bind(this);
     this.animateClass = this.animateClass.bind(this);
   }
 
-    componentDidUpdate(prevProps, prevState) {
+  componentWillUnmount() {
+    if(this.state.interval) {
+      clearInterval(this.state.interval);
+    }
+  }
+    componentDidUpdate() {
       if(this.state.active) {
         return;
       }
 
 
-      if(this.props.play) {
+      if(this.props.autoplay) {
         this.startTimer();
       }
     }
 
   onComplete(): void {
-    this.setState({active: false, paused: false});
     clearInterval(this.state.interval);
+    this.setState({active: false, paused: false, finished: true, interval: null},
+      this.toggleAnimate());
+
+
     if(this.props.onComplete) {
       this.props.onComplete();
     }
   }
 
-    pad(number): string {
+    pad(number: number): string|number {
       if(number == null) {
         return '00';
       }
@@ -52,26 +82,38 @@ class CountdownTimer extends Component {
 
   getCircumference(): number {
     const circum = 2*Math.PI*this.state.radius;
-    return  circum.toFixed(0);
+    return  Number(circum.toFixed(0));
+  }
+
+  toggleAnimate(): undefined {
+    if(this.state.active) {
+      this.setState({animateTimer: true});
+    } else {
+      this.setState({animateTimer: false});
+    }
+    return;
   }
 
   togglePlay(): void {
     if(!this.state.active) {
+      if(this.props.onTogglePlay) {
+        this.props.onTogglePlay(this.state.paused, this.state.active);
+      }
       this.startTimer();
       return;
     }
 
     this.setState({paused: !this.state.paused});
 
-    if(this.props.togglePlay) {
-      this.props.togglePlay(this.state.paused);
+    if(this.props.onTogglePlay) {
+      this.props.onTogglePlay(this.state.paused, this.state.active);
     }
   }
 
   startTimer(): void {
     const minutes = (isNaN(this.props.minutes) || this.props.minutes=="" || this.props.minutes == null) ? 0 : parseInt(this.props.minutes);
 
-      const seconds = (isNaN(this.props.seconds) || this.props.seconds=="" || this.props.seconds == null) ? 0 : parseInt(this.props.seconds);
+    const seconds = (isNaN(this.props.seconds) || this.props.seconds=="" || this.props.seconds == null) ? 0 : parseInt(this.props.seconds);
 
     this.setState({minutes: minutes, seconds: seconds});
 
@@ -84,7 +126,7 @@ class CountdownTimer extends Component {
     this.setState({interval: setInterval(this.decrease.bind(this), 1000)});
   }
 
-  getMinutes() {
+  getMinutes(): number {
     if(this.state.active) {
       return this.state.minutes;
     }
@@ -92,7 +134,7 @@ class CountdownTimer extends Component {
     return this.props.minutes;
   }
 
-  getSeconds() {
+  getSeconds(): number {
     if(this.state.active) {
       return this.state.seconds;
     }
@@ -110,6 +152,7 @@ class CountdownTimer extends Component {
       return;
     }
 
+    this.toggleAnimate();
     const timeInSeconds = this.state.currentTimeInSeconds-1;
     this.setState({currentTimeInSeconds: timeInSeconds});
 
@@ -133,13 +176,14 @@ class CountdownTimer extends Component {
 
   getDashArray(): string {
     const circumference = this.getCircumference();
+
     if(!this.state.active) {
       return circumference + " " + circumference;
     }
     return this.getRemaining() + " " + this.getCircumference();
   }
 
-  renderIcons() {
+  renderIcons(): any {
     if(this.state.active && !this.state.paused) {
       return (
         <g id="pause-icon" stroke="white" stroke-width="1">
@@ -159,20 +203,20 @@ class CountdownTimer extends Component {
   }
 
   animateClass(): string {
-    if(!this.state.active) {
-      return '';
+    if(this.state.animateTimer) {
+      return 'timer-animate';
     }
 
-    return 'timer-animate';
+    return '';
   }
 
 
-  strokeClass(): void {
+  strokeClass(): string {
     if(!this.state.active) {
       return 'stroke-active';
     }
 
-    if(this.state.currentTimeInSeconds/this.state.timeLimit <= 0.5) {
+    if(this.state.currentTimeInSeconds/this.state.timeLimit <= this.props.warning_threshold) {
       return 'stroke-warning';
     }
 
@@ -180,6 +224,7 @@ class CountdownTimer extends Component {
   }
 
   render() {
+    const togglePlayStyle = {'margin-left':'4px'} as React.CSSProperties;
     return (
       <svg viewBox="0 0 100 130" height="300" width="300" xmlns="http://www.w3.org/2000/svg">
   <g className={"base-timer__circle"} id="base-timer-circle-group">
@@ -197,7 +242,7 @@ class CountdownTimer extends Component {
       <stop offset="100%" stop-color="#ff2200" stop-opacity="1"></stop>
     </linearGradient>
   </defs>
-  <a id="toggle-play" onClick={this.togglePlay} style={{'margin-left':'4px'}}>
+  <a id="toggle-play" onClick={this.togglePlay} style={togglePlayStyle}>
      <circle cx="48%" cy="89%" r="10" fill="url(#pause-play-gradient)" stroke="black" />
   <circle id="circle-pause" cx="48%" cy="89%" r="10" stroke="#cc4400" fill="transparent" />
    {this.renderIcons()}
@@ -206,5 +251,22 @@ class CountdownTimer extends Component {
     );
   }
 }
+
+// CountdownTimer.propTypes = {
+//   radius: PropTypes.number,
+//   autoplay: PropTypes.bool,
+//   timer_remaining_id: PropTypes.string,
+//   onTogglePlay: PropTypes.func,
+//   onComplete: PropTypes.func,
+//   minutes: PropTypes.number,
+//   seconds: PropTypes.number,
+//   warning_threshold: PropTypes.number
+// };
+
+/*CountdownTimer.defaultProps = {
+  radius: RADIUS,
+  timer_remaining_id: TIMER_REMAINING_ID,
+  warning_threshold: WARNING_THRESHOLD
+};*/
 
 export default CountdownTimer;

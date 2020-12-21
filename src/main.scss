@@ -1,0 +1,43 @@
+#timer-value {
+  font-size: 14pt;
+}
+
+.base-timer__path-remaining {
+
+  /* Rounds the line endings to create a seamless circle */
+  stroke-linecap: round;
+
+  /* Makes sure the animation starts at the top of the circle */
+  transform: rotate(-90deg);
+  transform-origin: center;
+
+  /* One second aligns with the speed of the countdown timer */
+
+  /* Allows the ring to change color when the color value updates */
+  stroke: green;
+}
+
+.timer-animate {
+  transition: 1s linear all;
+}
+
+.stroke-running {
+  stroke: #339900;
+}
+
+.stroke-warning {
+  stroke: #ff9966;
+}
+
+.base-timer__svg {
+  /* Flips the svg and makes the animation to move left-to-right */
+  transform: scaleX(-1);
+}
+
+.hide {
+  display:none;
+}
+
+.show {
+  display: block;
+}
