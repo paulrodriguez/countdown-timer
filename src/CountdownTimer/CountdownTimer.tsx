@@ -1,13 +1,14 @@
 import * as React from 'react';
 
+import './main.scss';
+
 const RADIUS = 35;
 const TIMER_REMAINING_ID='base-timer-path-remaining';
 const WARNING_THRESHOLD = 0.5;
 
 class CountdownTimer extends React.Component<any, any> {
-  // // @ts-ignore
+
   // static propTypes: {
-  //   // @ts-ignore
   //   radius: PropTypes.number,
   //   autoplay: PropTypes.bool,
   //   timer_remaining_id: PropTypes.string,
@@ -16,13 +17,16 @@ class CountdownTimer extends React.Component<any, any> {
   //   minutes: PropTypes.number,
   //   seconds: PropTypes.number,
   //   warning_threshold: PropTypes.number
-
-    // }
+  //
+  //   }
 
     static defaultProps = {
       radius: RADIUS,
       timer_remaining_id: TIMER_REMAINING_ID,
-      warning_threshold: WARNING_THRESHOLD
+      warning_threshold: WARNING_THRESHOLD,
+      width: 300,
+      height: 300,
+      autoplay: false
     }
   constructor(props: any) {
     super(props);
@@ -39,6 +43,7 @@ class CountdownTimer extends React.Component<any, any> {
     this.togglePlay = this.togglePlay.bind(this);
     this.toggleAnimate = this.toggleAnimate.bind(this);
     this.animateClass = this.animateClass.bind(this);
+    this.resetTimer = this.resetTimer.bind(this);
   }
 
   componentWillUnmount() {
@@ -46,25 +51,32 @@ class CountdownTimer extends React.Component<any, any> {
       clearInterval(this.state.interval);
     }
   }
-    componentDidUpdate() {
-      if(this.state.active) {
-        return;
-      }
 
-
-      if(this.props.autoplay) {
-        this.startTimer();
-      }
+  componentDidMount() {
+    if(this.props.autoplay) {
+      this.startTimer();
     }
+  }
+
+
+  resetTimer(): void {
+    if(this.props.autoplay) {
+      this.startTimer();
+    }
+  }
 
   onComplete(): void {
     clearInterval(this.state.interval);
-    this.setState({active: false, paused: false, finished: true, interval: null},
-      this.toggleAnimate());
+    this.setState({active: false, paused: false, finished: true, interval: null, autoplay: false});
+    this.toggleAnimate();
 
 
     if(this.props.onComplete) {
       this.props.onComplete();
+    }
+
+    if(this.props.canRestart && this.props.canRestart()) {
+      this.startTimer();
     }
   }
 
@@ -99,6 +111,7 @@ class CountdownTimer extends React.Component<any, any> {
       if(this.props.onTogglePlay) {
         this.props.onTogglePlay(this.state.paused, this.state.active);
       }
+
       this.startTimer();
       return;
     }
@@ -186,7 +199,7 @@ class CountdownTimer extends React.Component<any, any> {
   renderIcons(): any {
     if(this.state.active && !this.state.paused) {
       return (
-        <g id="pause-icon" stroke="white" stroke-width="1">
+        <g id="pause-icon" stroke="white" strokeWidth="1">
          <rect x="45%" y="85%" width="1" height="10" />
          <rect x="50%" y="85%" width="1" height="10" />
         </g>
@@ -224,49 +237,34 @@ class CountdownTimer extends React.Component<any, any> {
   }
 
   render() {
-    const togglePlayStyle = {'margin-left':'4px'} as React.CSSProperties;
+    const togglePlayStyle = {'marginLeft':'4px'} as React.CSSProperties;
     return (
-      <svg viewBox="0 0 100 130" height="300" width="300" xmlns="http://www.w3.org/2000/svg">
-  <g className={"base-timer__circle"} id="base-timer-circle-group">
-    <circle cx="50%" cy="50%" r="35" fill="white" stroke="gray" stroke-width="2" stroke-dasharray="0" id="base-timer-path-empty" />
+      <svg viewBox="0 0 100 130" height={this.props.height}
+        width={this.props.width} xmlns="http://www.w3.org/2000/svg">
+        <g className={"base-timer__circle"} id="base-timer-circle-group">
+          <circle cx="50%" cy="50%" r="35" fill="white" stroke="gray"
+            strokeWidth="2" strokeDasharray="0" id="base-timer-path-empty" />
 
-     <circle cx="50%" cy="50%"   r={this.state.radius}
+          <circle cx="50%" cy="50%"   r={this.state.radius}
             id={this.state.id}
             className={"base-timer__path-remaining " + this.animateClass() + " " + this.strokeClass()}
-            fill="transparent" stroke-width="2" stroke-dasharray={this.getDashArray()} />
-             <text x="28%" y="55%" id="timer-value">{this.pad(this.getMinutes())}:{this.pad(this.getSeconds())}</text>
-      </g>
-      <defs>
-    <linearGradient id="pause-play-gradient" x1="0%" y1="0%" x2="0%" y2="100%" spreadMethod="pad">
-      <stop offset="0%" stop-color="#ff5500" stop-opacity="1"></stop>
-      <stop offset="100%" stop-color="#ff2200" stop-opacity="1"></stop>
-    </linearGradient>
-  </defs>
-  <a id="toggle-play" onClick={this.togglePlay} style={togglePlayStyle}>
-     <circle cx="48%" cy="89%" r="10" fill="url(#pause-play-gradient)" stroke="black" />
-  <circle id="circle-pause" cx="48%" cy="89%" r="10" stroke="#cc4400" fill="transparent" />
-   {this.renderIcons()}
-  </a>
+            fill="transparent" strokeWidth="2" strokeDasharray={this.getDashArray()} />
+           <text x="28%" y="55%" id="timer-value">{this.pad(this.getMinutes())}:{this.pad(this.getSeconds())}</text>
+        </g>
+        <defs>
+          <linearGradient id="pause-play-gradient" x1="0%" y1="0%" x2="0%" y2="100%" spreadMethod="pad">
+            <stop offset="0%" stopColor="#ff5500" stopOpacity="1"></stop>
+            <stop offset="100%" stopColor="#ff2200" stopOpacity="1"></stop>
+          </linearGradient>
+        </defs>
+        <a id="toggle-play" onClick={this.togglePlay} style={togglePlayStyle}>
+           <circle cx="48%" cy="89%" r="10" fill="url(#pause-play-gradient)" stroke="black" />
+           <circle id="circle-pause" cx="48%" cy="89%" r="10" stroke="#cc4400" fill="transparent" />
+           {this.renderIcons()}
+        </a>
       </svg>
     );
   }
 }
-
-// CountdownTimer.propTypes = {
-//   radius: PropTypes.number,
-//   autoplay: PropTypes.bool,
-//   timer_remaining_id: PropTypes.string,
-//   onTogglePlay: PropTypes.func,
-//   onComplete: PropTypes.func,
-//   minutes: PropTypes.number,
-//   seconds: PropTypes.number,
-//   warning_threshold: PropTypes.number
-// };
-
-/*CountdownTimer.defaultProps = {
-  radius: RADIUS,
-  timer_remaining_id: TIMER_REMAINING_ID,
-  warning_threshold: WARNING_THRESHOLD
-};*/
 
 export default CountdownTimer;

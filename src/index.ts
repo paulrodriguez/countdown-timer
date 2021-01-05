@@ -1,2 +1,3 @@
-import './main.scss';
-export {default as CountdownTimer} from './CountdownTimer';
+import CountdownTimer from './CountdownTimer/CountdownTimer';
+
+export { CountdownTimer };
