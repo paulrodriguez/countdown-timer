@@ -14,30 +14,14 @@ import * as CountdownTimer from 'countdown-timer'
 ```
 
 ### Props
-radius: Number, default=35
-the radius of the timer circle.
-defaults to 35 based on viewBox of SVG
-
-autoplay: Boolean
-determines whether the timer should start playing when it is not active,
-which is usually when it is rendered for the first time or it has finished
-a cycle.
-
-timer_remaining_id: string, default='base-timer-path-remaining'
-the id of the svg circle that shrinks as the countdown happens
-
-onTogglePlay(isPaused: bool, isActive:bool): function, optional
-a callback function when the play/pause button is clicked
-
-onComplete: function, optional
-callback function when the timer has completed
-
-minutes: Number, required
-total minutes for timer
-
-seconds: number, required
-total seconds for timer
-
-warning_threshold: number, optional, default=0.5
-the threshold value to change the color of the timer circle to indicate
-it has reached a certain point.
+| Name | Type | Description | Default |
+| ---- | ---- | ----------- | ------- |
+|radius | Number | the radius of the circle | 35 |
+| autoplay | Boolean | determines whether to autoplay on mount | False |
+| timer_remaining_id | string | id for animated circle | "base-timer-path-remaining" |
+| onTogglePlay(isPaused, isActive) | function | callback function when play/pause button is clicked, passing the flags whether timer is paused or active after changing state |
+onComplete | function | callback when timer has finished |
+canRestart | function | called after timer completes | determines whether the timer can restart again (warming: this may cause an infinite loop if not careful) |
+| minutes | number | the total minutes to add to the timer |
+seconds | number | the total seconds to add to the timer |
+warning_threshold | number | value to change the color of the timer after it reaches a certain period | 0.5

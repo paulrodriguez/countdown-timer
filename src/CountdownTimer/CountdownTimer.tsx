@@ -43,7 +43,6 @@ class CountdownTimer extends React.Component<any, any> {
     this.togglePlay = this.togglePlay.bind(this);
     this.toggleAnimate = this.toggleAnimate.bind(this);
     this.animateClass = this.animateClass.bind(this);
-    this.resetTimer = this.resetTimer.bind(this);
   }
 
   componentWillUnmount() {
@@ -59,15 +58,9 @@ class CountdownTimer extends React.Component<any, any> {
   }
 
 
-  resetTimer(): void {
-    if(this.props.autoplay) {
-      this.startTimer();
-    }
-  }
-
   onComplete(): void {
     clearInterval(this.state.interval);
-    this.setState({active: false, paused: false, finished: true, interval: null, autoplay: false});
+    this.setState({active: false, paused: false, finished: true, interval: null});
     this.toggleAnimate();
 
 
