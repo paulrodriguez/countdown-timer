@@ -109,11 +109,16 @@ class CountdownTimer extends React.Component<any, any> {
       return;
     }
 
-    this.setState({paused: !this.state.paused});
+    this.setState({
+      paused: !this.state.paused},
+      () => {
+        if(this.props.onTogglePlay) {
+          this.props.onTogglePlay(this.state.paused, this.state.active);
+        }
+      }
+    );
 
-    if(this.props.onTogglePlay) {
-      this.props.onTogglePlay(this.state.paused, this.state.active);
-    }
+
   }
 
   startTimer(): void {
