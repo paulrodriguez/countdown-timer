@@ -5,20 +5,28 @@ import './main.scss';
 const RADIUS = 35;
 const TIMER_REMAINING_ID='base-timer-path-remaining';
 const WARNING_THRESHOLD = 0.5;
+const SECS_PER_MIN = 60;
 
-class CountdownTimer extends React.Component<any, any> {
 
-  // static propTypes: {
-  //   radius: PropTypes.number,
-  //   autoplay: PropTypes.bool,
-  //   timer_remaining_id: PropTypes.string,
-  //   onTogglePlay: PropTypes.func,
-  //   onComplete: PropTypes.func,
-  //   minutes: PropTypes.number,
-  //   seconds: PropTypes.number,
-  //   warning_threshold: PropTypes.number
-  //
-  //   }
+interface CountdownTimerProps {
+  minutes: number|string,
+  seconds: number|string,
+  radius?: number,
+  timer_remaining_id?: string,
+  warning_threshold?: number,
+  width?:number,
+  height?:number,
+  autplay?: boolean,
+  onTogglePlay?: (isPaused: boolean, isActive: boolean) => void,
+  onTick?: (deltaTime: number)=>void,
+  onComplete?: ()=>void | [boolean, number, number],
+  direction?: "left" | "right"
+};
+
+/**
+ * for now, use any type for props and state
+ */
+class CountdownTimer extends React.Component<CountdownTimerProps, any> {
 
     static defaultProps = {
       radius: RADIUS,
@@ -26,7 +34,8 @@ class CountdownTimer extends React.Component<any, any> {
       warning_threshold: WARNING_THRESHOLD,
       width: 300,
       height: 300,
-      autoplay: false
+      autoplay: false,
+      direction: "left"
     }
   constructor(props: any) {
     super(props);
@@ -35,14 +44,13 @@ class CountdownTimer extends React.Component<any, any> {
       id: props.timer_remaining_id,
       active: false,
       paused: false,
-      finished: false,
-      interval: null,
-      animateTimer: false
+      prevTime: null
+
     }
 
     this.togglePlay = this.togglePlay.bind(this);
-    this.toggleAnimate = this.toggleAnimate.bind(this);
-    this.animateClass = this.animateClass.bind(this);
+    this.tick = this.tick.bind(this);
+    this.updateTime = this.updateTime.bind(this);
   }
 
   componentWillUnmount() {
@@ -53,23 +61,21 @@ class CountdownTimer extends React.Component<any, any> {
 
   componentDidMount() {
     if(this.props.autoplay) {
-      this.startTimer();
+      this.startTimer(this.props.minutes, this.props.seconds);
     }
   }
 
 
   onComplete(): void {
-    clearInterval(this.state.interval);
-    this.setState({active: false, paused: false, finished: true, interval: null});
-    this.toggleAnimate();
+    this.setState({active: false, paused: false, prevTime: null});
 
 
     if(this.props.onComplete) {
-      this.props.onComplete();
-    }
+      const [restart=false, minutes=0, seconds=0] = this.props.onComplete();
 
-    if(this.props.canRestart && this.props.canRestart()) {
-      this.startTimer();
+      if(restart) {
+        this.startTimer(minutes, seconds);
+      }
     }
   }
 
@@ -90,14 +96,6 @@ class CountdownTimer extends React.Component<any, any> {
     return  Number(circum.toFixed(0));
   }
 
-  toggleAnimate(): undefined {
-    if(this.state.active) {
-      this.setState({animateTimer: true});
-    } else {
-      this.setState({animateTimer: false});
-    }
-    return;
-  }
 
   togglePlay(): void {
     if(!this.state.active) {
@@ -105,7 +103,7 @@ class CountdownTimer extends React.Component<any, any> {
         this.props.onTogglePlay(this.state.paused, this.state.active);
       }
 
-      this.startTimer();
+      this.startTimer(this.props.minutes, this.props.seconds);
       return;
     }
 
@@ -121,20 +119,39 @@ class CountdownTimer extends React.Component<any, any> {
 
   }
 
-  startTimer(): void {
-    const minutes = (isNaN(this.props.minutes) || this.props.minutes=="" || this.props.minutes == null) ? 0 : parseInt(this.props.minutes);
+  getMinutesSeconds(location: string): number[] {
+    if(location == 'props') {
+      const minutes = (isNaN(this.props.minutes) || this.props.minutes=="" || this.props.minutes == null) ? 0 : parseInt(this.props.minutes);
 
-    const seconds = (isNaN(this.props.seconds) || this.props.seconds=="" || this.props.seconds == null) ? 0 : parseInt(this.props.seconds);
+      const seconds = (isNaN(this.props.seconds) || this.props.seconds=="" || this.props.seconds == null) ? 0 : parseInt(this.props.seconds);
 
-    this.setState({minutes: minutes, seconds: seconds});
+      return [minutes, seconds];
+    }
 
-    const totalTime = minutes*60+seconds;
+    if(location == 'state') {
+      const minutes = (isNaN(this.state.minutes) || this.state.minutes=="" || this.state.minutes == null) ? 0 : parseInt(this.state.minutes);
 
-    this.setState({currentTimeInSeconds: totalTime});
-    this.setState({timeLimit: totalTime});
-    this.setState({active: true});
+      const seconds = (isNaN(this.state.seconds) || this.state.seconds=="" || this.state.seconds == null) ? 0 : parseInt(this.state.seconds);
 
-    this.setState({interval: setInterval(this.decrease.bind(this), 1000)});
+      return [minutes, seconds];
+    }
+  }
+  startTimer(minutes, seconds): void {
+    const newMinutes = (isNaN(minutes) || minutes=="" || minutes == null) ? 0 : parseInt(minutes);
+
+    const newSeconds = (isNaN(seconds) || seconds=="" || seconds == null) ? 0 : parseInt(seconds);
+
+      this.setState({minutes: newMinutes, seconds: newSeconds});
+
+
+    const totalTime = newMinutes*SECS_PER_MIN+newSeconds;
+
+    this.setState({
+      currentTimeInSeconds: totalTime,
+      timeLimit: totalTime,
+      active: true}, () => {
+        requestAnimationFrame(this.tick);
+    });
   }
 
   getMinutes(): number {
@@ -153,26 +170,54 @@ class CountdownTimer extends React.Component<any, any> {
     return this.props.seconds;
   }
 
-  decrease(): void {
-    if(this.state.paused) {
+  tick(time: any) {
+    if(this.state.prevTime == null) {
+      this.setState({prevTime: time});
+
+      requestAnimationFrame(this.tick);
+
       return;
     }
 
-    if(this.state.currentTimeInSeconds<=0) {
+    const delta = time - this.state.prevTime;
+
+    this.setState({prevTime: time});
+
+
+    if(this.state.paused) {
+      requestAnimationFrame(this.tick);
+      return;
+    }
+
+    const timeInSeconds = this.state.currentTimeInSeconds - delta/1000;
+
+    this.setState({currentTimeInSeconds: timeInSeconds});
+
+    if(this.props.onTick) {
+      this.props.onTick(delta/1000);
+    }
+
+    if(timeInSeconds < 0) {
       this.onComplete();
       return;
     }
 
-    this.toggleAnimate();
-    const timeInSeconds = this.state.currentTimeInSeconds-1;
-    this.setState({currentTimeInSeconds: timeInSeconds});
+    this.updateTime(timeInSeconds);
 
-    if(this.state.seconds > 0) {
-      this.setState({seconds: this.state.seconds-1});
-    } else {
-      this.setState({seconds: 59});
-      this.setState({minutes: this.state.minutes-1});
-    }
+    requestAnimationFrame(this.tick);
+  }
+
+  /**
+   * update the minutes and seconds based on time given in seconds
+   *
+   * @param {Number} time
+   * @return void
+   */
+  updateTime(time: any) {
+    const minutes = Math.floor(time/60);
+    const seconds = Math.floor(time%60);
+
+    this.setState({minutes: minutes, seconds: seconds});
   }
 
   getTimeFraction(): number {
@@ -185,13 +230,15 @@ class CountdownTimer extends React.Component<any, any> {
     return Math.max(this.getTimeFraction() * this.getCircumference(), 0);
   }
 
-  getDashArray(): string {
+  getDashArray(): number[] {
     const circumference = this.getCircumference();
 
     if(!this.state.active) {
-      return circumference + " " + circumference;
+      return [-1, circumference];
     }
-    return this.getRemaining() + " " + this.getCircumference();
+
+
+    return [this.getRemaining(), circumference];
   }
 
   renderIcons(): any {
@@ -213,15 +260,6 @@ class CountdownTimer extends React.Component<any, any> {
     }
   }
 
-  animateClass(): string {
-    if(this.state.animateTimer) {
-      return 'timer-animate';
-    }
-
-    return '';
-  }
-
-
   strokeClass(): string {
     if(!this.state.active) {
       return 'stroke-active';
@@ -230,12 +268,24 @@ class CountdownTimer extends React.Component<any, any> {
     if(this.state.currentTimeInSeconds/this.state.timeLimit <= this.props.warning_threshold) {
       return 'stroke-warning';
     }
-
+    //
     return 'stroke-active';
+  }
+
+  directionClass(): string {
+    if(this.props.direction == 'left') {
+      return 'dir-counterclockwise';
+    } else if(this.props.direction == 'right') {
+      return "dir-clockwise";
+    } else {
+      return 'dir-counterclockwise';
+    }
   }
 
   render() {
     const togglePlayStyle = {'marginLeft':'4px'} as React.CSSProperties;
+    const circlePathClasses = "base-timer__path-remaining dir-counterclockwise animate-stroke "
+      + this.directionClass()+ " " + this.strokeClass();
     return (
       <svg viewBox="0 0 100 130" height={this.props.height}
         width={this.props.width} xmlns="http://www.w3.org/2000/svg">
@@ -245,7 +295,7 @@ class CountdownTimer extends React.Component<any, any> {
 
           <circle cx="50%" cy="50%"   r={this.state.radius}
             id={this.state.id}
-            className={"base-timer__path-remaining " + this.animateClass() + " " + this.strokeClass()}
+            className={circlePathClasses}
             fill="transparent" strokeWidth="2" strokeDasharray={this.getDashArray()} />
            <text x="28%" y="55%" id="timer-value">{this.pad(this.getMinutes())}:{this.pad(this.getSeconds())}</text>
         </g>
