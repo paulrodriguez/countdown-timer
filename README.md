@@ -12,10 +12,10 @@ importing the component
 ```import * as CountdownTimer from 'countdown-timer'
 ```
 
-minimum numbe of parameters
-'''
+Basic component
+```
 <CountdownTimer minutes={1} seconds={1} />
-'''
+```
 
 ### Examples
 start storybook by running the command ```npm run storybook```
