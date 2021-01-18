@@ -21,7 +21,7 @@ Basic component
 ```
 
 ### Examples
-[click here to view the storybook examples](https://6004c8b65f88f20021ddc457-cbaucqgdpk.chromatic.com)
+[click here to view the storybook examples](https://www.chromatic.com/component?appId=6004c8b65f88f20021ddc457&name=CountdownTimer)
 
 
 start storybook by running the command ```npm run storybook```
