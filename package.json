@@ -15,7 +15,7 @@
     "storybook": "start-storybook -p 6006",
     "storybook:export": "build-storybook",
     "prepare": "npm run build",
-    "postinstall": "if [[ ${PWD##*/} != 'node_modules' ]]; then sh husky_install.sh; fi",
+    "postinstall": "echo \"$(pwd)\" && if [[ \"$(pwd)\" =~ node_modules ]]; then echo 1; else sh husky_install.sh; fi",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "chromatic": "chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes"
