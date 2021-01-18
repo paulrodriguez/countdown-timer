@@ -16,6 +16,8 @@
     "storybook:export": "build-storybook",
     "prepare": "npm run build",
     "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable",
     "chromatic": "chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes"
   },
   "engines": {
@@ -54,6 +56,7 @@
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^1.3.1",
     "node-sass": "^5.0.0",
+    "pinst": "^2.1.1",
     "rollup": "^2.35.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
