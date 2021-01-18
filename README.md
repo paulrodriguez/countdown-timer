@@ -12,7 +12,7 @@ npm install git+https://github.com/paulrodriguez/countdown-timer.git#master
 ## Usage
 importing the component
 ```
-import * as CountdownTimer from \'countdown-timer\'
+import * as CountdownTimer from 'countdown-timer'
 ```
 
 Basic component
