@@ -1,12 +1,16 @@
-# .github/workflows/chromatic.yml
-
-name: 'Chromatic Deployment'
-on: push
+name: Chromatic Deployment
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install dependencies
       - run: npm install
       - name: Publish to Chromatic
