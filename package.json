@@ -16,8 +16,7 @@
     "storybook:export": "build-storybook",
     "prepare": "npm run build",
     "postinstall": "husky install",
-    "chromatic": "npx chromatic --project-token",
-    "cst": "echo"
+    "chromatic": "chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes"
   },
   "engines": {
     "node": ">=8",
