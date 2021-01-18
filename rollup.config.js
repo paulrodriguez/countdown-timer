@@ -26,38 +26,11 @@ export default [
       }
     ],
     plugins: [
-      //sass({ insert: true }),
-      //peerDepsExternal(),
       nodeResolve(),
       commonjs(),
       typescript({ useTsconfigDeclarationDir: true }),
       postcss()
     ]
   },
-  /*{
-    input: 'examples/demo1.js',
-    output: [
-      {
-        file: 'examples/demo1/demo1.iife.js',
-        format: 'iife',
-        exports: 'named',
-        sourcemap: true,
-        strict: false,
-        globals: {
-          'react':'React',
-          'react-dom':'ReactDOM'
-        }
 
-      }
-    ],
-    plugins: [
-      sass({ insert: true }),
-      babel({
-        presets: ['@babel/env', '@babel/preset-react']
-      }),
-      nodeResolve()
-    ],
-    external: ['react', 'react-dom'],
-
-  }*/
 ]

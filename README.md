@@ -5,11 +5,14 @@ A React countdown timer built using SVG graphics to show circle timer
 progress.
 
 ## Installation
-```npm install git+https://github.com/paulrodriguez/countdown-timer.git#master```
+```
+npm install git+https://github.com/paulrodriguez/countdown-timer.git#master
+```
 
 ## Usage
 importing the component
-```import * as CountdownTimer from 'countdown-timer'
+```
+import * as CountdownTimer from \'countdown-timer\'
 ```
 
 Basic component
@@ -18,6 +21,9 @@ Basic component
 ```
 
 ### Examples
+[click here to view the storybook examples](https://6004c8b65f88f20021ddc457-cbaucqgdpk.chromatic.com)
+
+
 start storybook by running the command ```npm run storybook```
 you will be taken to a page showing some examples of the timer with different configurations
 
