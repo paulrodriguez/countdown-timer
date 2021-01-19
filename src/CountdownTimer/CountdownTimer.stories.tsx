@@ -70,7 +70,7 @@ export const OnCompleteVoidTimer = () => (
 export const CounterClockwiseTimer = () => (
   <>
   <h1>Counter-Clockwise</h1>
-  <p>change direction circle shrinks by passing prop direction=&#123;"right"&#125;</p>
+  <p>change direction circle shrinks by passing prop direction=&#123;&quot;right&quot;&#125;</p>
   <CountdownTimer minutes={0} seconds={5} direction={"right"}  />
   </>
 );

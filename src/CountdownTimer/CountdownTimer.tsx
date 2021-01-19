@@ -23,7 +23,7 @@ interface CountdownTimerProps {
   onTick?: (deltaTime: number)=>void,
   onComplete?: () => (void|CustomTuple),
   direction?: "left"|"right"
-};
+}
 
 /**
  * CountdownTimer class
@@ -131,13 +131,13 @@ class CountdownTimer extends React.Component<CountdownTimerProps, any> {
 
   startTimer(minutes: number|string, seconds: number|string): void {
 
-    let newMinutes: number = 0;
+    let newMinutes = 0;
 
     if(typeof minutes==="number" || (typeof minutes === "string" && !Number.isNaN(minutes))) {
       newMinutes = Number(minutes);
     }
 
-    let newSeconds: number = 0;
+    let newSeconds = 0;
     if(typeof seconds==="number" || (typeof seconds === "string" && !Number.isNaN(seconds))) {
       newSeconds = Number(seconds);
     }
