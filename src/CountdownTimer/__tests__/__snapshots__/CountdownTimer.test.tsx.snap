@@ -1,0 +1,98 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CountdownTimer is initialized correctly 1`] = `
+<svg
+  height={300}
+  viewBox="0 0 100 130"
+  width={300}
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g
+    className="base-timer__circle"
+    id="base-timer-circle-group"
+  >
+    <circle
+      cx="50%"
+      cy="50%"
+      fill="white"
+      id="base-timer-path-empty"
+      r="35"
+      stroke="gray"
+      strokeDasharray="0"
+      strokeWidth="2"
+    />
+    <circle
+      className="base-timer__path-remaining dir-counterclockwise animate-stroke dir-counterclockwise stroke-active"
+      cx="50%"
+      cy="50%"
+      fill="transparent"
+      id="base-timer-path-remaining"
+      r={35}
+      strokeDasharray="-1 220"
+      strokeWidth="2"
+    />
+    <text
+      id="timer-value"
+      x="28%"
+      y="55%"
+    >
+      00:10
+    </text>
+  </g>
+  <defs>
+    <linearGradient
+      id="pause-play-gradient"
+      spreadMethod="pad"
+      x1="0%"
+      x2="0%"
+      y1="0%"
+      y2="100%"
+    >
+      <stop
+        offset="0%"
+        stopColor="#ff5500"
+        stopOpacity="1"
+      />
+      <stop
+        offset="100%"
+        stopColor="#ff2200"
+        stopOpacity="1"
+      />
+    </linearGradient>
+  </defs>
+  <a
+    id="toggle-play"
+    onClick={[Function]}
+    style={
+      Object {
+        "marginLeft": "4px",
+      }
+    }
+  >
+    <circle
+      cx="48%"
+      cy="89%"
+      fill="url(#pause-play-gradient)"
+      r="10"
+      stroke="black"
+    />
+    <circle
+      cx="48%"
+      cy="89%"
+      fill="transparent"
+      id="circle-pause"
+      r="10"
+      stroke="#cc4400"
+    />
+    <g
+      fill="white"
+      id="play-icon"
+      stroke="white"
+    >
+      <polygon
+        points="45.5,110.5 52.5,115.5 45.5,120.5"
+      />
+    </g>
+  </a>
+</svg>
+`;
