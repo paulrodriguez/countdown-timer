@@ -5,7 +5,7 @@
 
 module.exports = {
   "roots": [
-    "./src"
+    "./tests"
   ],
   "testMatch": [
     "**/__tests__/**/*.+(ts|tsx|js)",

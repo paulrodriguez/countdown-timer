@@ -84,15 +84,7 @@ exports[`CountdownTimer is initialized correctly 1`] = `
       r="10"
       stroke="#cc4400"
     />
-    <g
-      fill="white"
-      id="play-icon"
-      stroke="white"
-    >
-      <polygon
-        points="45.5,110.5 52.5,115.5 45.5,120.5"
-      />
-    </g>
+    <SvgPlay />
   </a>
 </svg>
 `;
