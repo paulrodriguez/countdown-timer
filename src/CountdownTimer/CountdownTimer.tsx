@@ -1,4 +1,5 @@
 import * as React from 'react';
+import SvgPause from '../SvgPause';
 
 import './main.scss';
 
@@ -257,12 +258,13 @@ class CountdownTimer extends React.Component<CountdownTimerProps, any> {
 
   renderIcons(): any {
     if(this.state.active && !this.state.paused) {
-      return (
+      return (<SvgPause />);
+      /*return (
         <g id="pause-icon" stroke="white" strokeWidth="1">
          <rect x="45%" y="85%" width="1" height="10" />
          <rect x="50%" y="85%" width="1" height="10" />
         </g>
-       );
+      );*/
     }
 
     if(!this.state.active || this.state.paused) {
