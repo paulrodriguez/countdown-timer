@@ -1,6 +1,6 @@
 {
   "name": "countdown-timer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React Countdown timer component built using SVG graphics",
   "main": "build/index.js",
   "module": "build/index.esm.js",
@@ -15,7 +15,6 @@
     "storybook": "start-storybook -p 6006",
     "storybook:export": "build-storybook",
     "prepare": "npm run build",
-    "postinstall": "echo \"$(pwd)\" && if [[ \"$(pwd)\" =~ node_modules ]]; then echo 1; else sh ./husky_install.sh; fi",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "chromatic": "chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes",
